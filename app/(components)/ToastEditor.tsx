@@ -1,46 +1,31 @@
-// components/ToastEditor.tsx
-
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useEffect,
-} from "react";
-import { Editor } from "@toast-ui/react-editor";
+// ToastEditor.tsx
+import React, { useImperativeHandle, useRef, forwardRef } from "react";
+import { Editor as ToastUIEditor, EditorProps } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
-type ToastEditorProps = React.ComponentProps<typeof Editor>;
-
-export interface ToastEditorRef {
-  getInstance: () => Editor;
+// Extend the Editor type to include getMarkdown
+export interface ExtendedEditor extends ToastUIEditor {
+  getMarkdown: () => string;
 }
 
-const ToastEditor = forwardRef<ToastEditorRef, ToastEditorProps>(
-  (props, ref) => {
-    const editorRef = useRef<Editor>(null);
+export type ToastEditorRef = {
+  getInstance: () => ExtendedEditor;
+};
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        getInstance: () => {
-          if (editorRef.current) {
-            return editorRef.current;
-          }
-          throw new Error("Editor instance is not available");
-        },
-      }),
-      []
-    );
+const ToastEditor = forwardRef<ToastEditorRef, EditorProps>((props, ref) => {
+  const editorRef = useRef<ToastUIEditor>(null);
 
-    useEffect(() => {
-      if (editorRef.current) {
-        console.log("Editor has been initialized", editorRef.current);
+  useImperativeHandle(ref, () => ({
+    getInstance: () => {
+      if (!editorRef.current) {
+        throw new Error("Editor instance is not available");
       }
-    }, []);
+      return editorRef.current as ExtendedEditor;
+    },
+  }));
 
-    return <Editor {...props} ref={editorRef} />;
-  }
-);
+  return <ToastUIEditor {...props} ref={editorRef} />;
+});
 
 ToastEditor.displayName = "ToastEditor";
 

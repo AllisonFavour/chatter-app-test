@@ -22,11 +22,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav>
+        <div>
           {!!session && <NavBar2 />}
 
           {!session && <NavBar />}
-        </nav>
+        </div>
 
         {children}
       </body>

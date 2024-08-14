@@ -23,23 +23,3 @@ const postSchema = new Schema<IPost>({
 const Post = models.Post || model<IPost>("Post", postSchema);
 
 export default Post;
-
-// // models/Post.ts
-// import mongoose, { Schema, models, model } from 'mongoose';
-
-// const PostSchema = new Schema({
-//   title: { type: String, required: true },
-//   content: { type: String, required: true },
-//   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-//   tags: [String],
-//   images: [{ type: String }],
-//   videos: [{ type: String }],
-//   createdAt: { type: Date, default: Date.now },
-//   updatedAt: { type: Date, default: Date.now },
-//   likes: { type: Number, default: 0 },
-//   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-// });
-
-// const Post = models.Post || model('Post', PostSchema);
-
-// export default Post;

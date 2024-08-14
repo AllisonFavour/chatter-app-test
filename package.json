@@ -9,18 +9,41 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tiptap/core": "^2.5.9",
+    "@tiptap/react": "^2.5.9",
+    "@tiptap/starter-kit": "^2.5.9",
+    "@toast-ui/editor": "^3.2.2",
+    "@toast-ui/react-editor": "^3.2.3",
+    "axios": "^1.7.3",
+    "bcrypt": "^5.1.1",
+    "cloudinary": "^2.4.0",
+    "easymde": "^2.18.0",
+    "formidable": "^3.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "marked": "^14.0.0",
+    "mongoose": "^8.5.2",
+    "next": "14.2.5",
+    "next-auth": "^4.24.7",
+    "nodemailer": "^6.9.14",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.5"
+    "react-dropzone": "^14.2.3",
+    "react-markdown": "^9.0.1",
+    "react-simplemde-editor": "^5.2.0",
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/bcrypt": "^5.0.2",
+    "@types/formidable": "^3.4.5",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20",
+    "@types/nodemailer": "^6.4.15",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5"
+    "typescript": "^5"
   }
 }

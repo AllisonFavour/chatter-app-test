@@ -1,4 +1,4 @@
-import { Schema, model, models } from 'mongoose';
+import { Schema, model, models } from "mongoose";
 
 interface IPost {
   title: string;
@@ -13,31 +13,16 @@ interface IPost {
 const postSchema = new Schema<IPost>({
   title: { type: String, required: true },
   content: { type: String, required: true },
-  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+  author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const Post = models.Post || model<IPost>('Post', postSchema);
+const Post = models.Post || model<IPost>("Post", postSchema);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default Post;
 
 // // models/Post.ts
 // import mongoose, { Schema, models, model } from 'mongoose';

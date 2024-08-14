@@ -103,9 +103,9 @@ export default function LoginPage() {
                   Login
                 </button>
               </div>
-            </form>
 
-            {errorMessage && <div>{errorMessage}</div>}
+              {errorMessage && <div>{errorMessage}</div>}
+            </form>
           </div>
         </div>
       </div>

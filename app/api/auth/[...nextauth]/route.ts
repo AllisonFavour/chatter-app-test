@@ -13,11 +13,11 @@ type UserType = {
 };
 
 type AuthUser = {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+};
 
 const handler = NextAuth({
   providers: [
@@ -29,13 +29,18 @@ const handler = NextAuth({
       async authorize(credentials): Promise<AuthUser | null> {
         await connectToDatabase();
 
-        const user = await User.findOne({ email: credentials?.email }).lean().exec() as UserType | null;;
+        const user = (await User.findOne({ email: credentials?.email })
+          .lean()
+          .exec()) as UserType | null;
 
         if (!user) {
           throw new Error("No user found with the provided email.");
         }
 
-        const isValid = await bcrypt.compare(credentials?.password!, user.password!);
+        const isValid = await bcrypt.compare(
+          credentials?.password!,
+          user.password!
+        );
 
         if (!isValid) {
           throw new Error("Password incorrect.");

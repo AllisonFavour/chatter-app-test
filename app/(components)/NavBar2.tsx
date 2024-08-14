@@ -13,7 +13,6 @@ export default function NavBar() {
     setIsOpen(!isOpen);
   };
 
-
   return (
     <>
       <nav className="bg-white shadow-[-1px_-10px_20px_#7c3aed] fixed w-full z-10 top-0">
@@ -40,22 +39,23 @@ export default function NavBar() {
             } md:block`}
           >
             <Link
-              href="/login"
+              href="/profile"
               className="block mt-2 md:mt-0 md:ml-4 text-violet-600 hover:text-gray-700"
             >
-              Log In
-            </Link>
-            <Link
-              href="/register"
-              className="block mt-2 md:mt-0 md:ml-4 text-violet-600 hover:text-gray-700"
-            >
-              Register
+              Profile
             </Link>
             <Link
               href="/blogs"
               className="block mt-2 md:mt-0 md:ml-4 text-violet-600 hover:text-gray-700"
             >
               Blogs
+            </Link>
+
+            <Link
+              href="/"
+              className="block mt-2 md:mt-0 md:ml-4 text-violet-600 hover:text-gray-700"
+            >
+              Log out
             </Link>
           </div>
         </div>

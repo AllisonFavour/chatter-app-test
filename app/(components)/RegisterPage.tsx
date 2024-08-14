@@ -142,11 +142,11 @@ export default function RegisterPage() {
                   Register
                 </button>
               </div>
-            </form>
 
-            {errorMessage && (
-              <div className="text-red-500 mt-4">{errorMessage}</div>
-            )}
+              {errorMessage && (
+                <div className="text-red-500 mt-4">{errorMessage}</div>
+              )}
+            </form>
           </div>
         </div>
       </div>

@@ -2,12 +2,14 @@
 
 "use client";
 
-import React, { useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import React, { useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 // Dynamically import ToastEditor to ensure it's only rendered on the client side
-const ToastEditor = dynamic(() => import('../(components)/ToastEditor'), { ssr: false });
+const ToastEditor = dynamic(() => import("../(components)/ToastEditor"), {
+  ssr: false,
+});
 
 type ToastEditorRef = {
   getInstance: () => any;
@@ -16,15 +18,15 @@ type ToastEditorRef = {
 const CreatePostPage = () => {
   const router = useRouter();
   const editorRef = useRef<ToastEditorRef>(null);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    console.log('Editor ref:', editorRef.current);
+    console.log("Editor ref:", editorRef.current);
 
     if (!editorRef.current) {
-      console.error('Editor reference is not available');
+      console.error("Editor reference is not available");
       return;
     }
 
@@ -32,36 +34,36 @@ const CreatePostPage = () => {
       const editorInstance = editorRef.current.getInstance();
       const content = editorInstance.getMarkdown();
 
-      console.log('Title:', title);
-      console.log('Content:', content);
+      console.log("Title:", title);
+      console.log("Content:", content);
 
       if (!title || !content) {
-        alert('Title and content are required');
+        alert("Title and content are required");
         return;
       }
 
-      const response = await fetch('/api/posts', {
-        method: 'POST',
+      const response = await fetch("/api/posts", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ title, content }),
       });
 
       if (response.ok) {
-        router.push('/');
+        router.push("/");
       } else {
         const data = await response.json();
         alert(data.message);
       }
     } catch (error) {
-      console.error('Failed to create post:', error);
-      alert('An error occurred. Please try again.');
+      console.error("Failed to create post:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="mt-16">
       <div>
         <label htmlFor="title">Title</label>
         <input

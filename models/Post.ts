@@ -1,25 +1,38 @@
-import { Schema, model, models } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
+import { IUser } from './User';
+import { IComment } from './Comment';
 
-interface IPost {
+export interface IPost extends Document {
   title: string;
   content: string;
-  author: Schema.Types.ObjectId;
-  likes: Schema.Types.ObjectId[];
-  comments: Schema.Types.ObjectId[];
+  author: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  } | null; 
   createdAt: Date;
   updatedAt: Date;
+  likes: IUser['_id'][];
+  bookmarks: IUser['_id'][];
+  comments: IComment['_id'][];
 }
 
-const postSchema = new Schema<IPost>({
+const PostSchema: Schema = new Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
-  author: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  bookmarks: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 });
 
-const Post = models.Post || model<IPost>("Post", postSchema);
+PostSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
+
+const Post = mongoose.models.Post || mongoose.model<IPost>('Post', PostSchema);
 
 export default Post;

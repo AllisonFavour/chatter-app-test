@@ -52,10 +52,10 @@ export default function NavBar() {
               Register
             </Link>
             <Link
-              href="/blogs"
+              href="/posts"
               className="block mt-2 md:mt-0 md:ml-4 text-violet-600 hover:text-gray-700"
             >
-              Blogs
+              Blog Posts
             </Link>
           </div>
         </div>

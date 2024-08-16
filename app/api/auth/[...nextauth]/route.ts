@@ -1,49 +1,34 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import NextAuth, { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import connectToDatabase from "@/lib/mongoose";
 import User from "@/models/User";
 
-type UserType = {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
-
-type AuthUser = {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-};
-
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
-    Credentials({
+    CredentialsProvider({
+      name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" }
       },
-      async authorize(credentials): Promise<AuthUser | null> {
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
+        }
+
         await connectToDatabase();
 
-        const user = (await User.findOne({ email: credentials?.email })
-          .lean()
-          .exec()) as UserType | null;
+        const user = await User.findOne({ email: credentials.email });
 
         if (!user) {
           throw new Error("No user found with the provided email.");
         }
 
-        const isValid = await bcrypt.compare(
-          credentials?.password!,
-          user.password!
-        );
+        const isValid = await bcrypt.compare(credentials.password, user.password);
 
         if (!isValid) {
-          throw new Error("Password incorrect.");
+          throw new Error("Invalid password.");
         }
 
         return {
@@ -59,20 +44,31 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.firstName = token.firstName as string;
+        session.user.lastName = token.lastName as string;
       }
       return session;
     },
   },
   pages: {
     signIn: "/login",
-    signOut: "/",
   },
-});
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

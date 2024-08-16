@@ -1,194 +1,118 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import dynamic from "next/dynamic";
+import React, { useState, useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ToastEditorRef } from "../(components)/ToastEditor";
+import dynamic from "next/dynamic";
+import {
+  Editor as EditorType,
+  EditorProps as ToastUIEditorProps,
+} from "@toast-ui/react-editor";
 
-// Dynamically import ToastEditor to ensure it's only rendered on the client side
-const ToastEditor = dynamic(() => import("../(components)/ToastEditor"), {
-  ssr: false,
-});
+interface ExtendedEditorProps extends ToastUIEditorProps {
+  forwardedRef?: React.RefObject<EditorType>;
+}
 
-const CreatePostPage: React.FC = () => {
+const EditorWrapper = dynamic<ExtendedEditorProps>(
+  () =>
+    import("@toast-ui/react-editor").then((mod) => {
+      import("@toast-ui/editor/dist/toastui-editor.css");
+      return ({ forwardedRef, ...props }) => <mod.Editor ref={forwardedRef} {...props} />;
+    }),
+  { ssr: false, loading: () => <p>Loading editor...</p> }
+);
+
+export default function CreatePost() {
+  const [title, setTitle] = useState("");
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const editorRef = useRef<ToastEditorRef>(null);
-  const [title, setTitle] = useState<string>("");
+  const editorRef = useRef<EditorType>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
 
-    if (!editorRef.current) {
-      console.error("Editor reference is not available");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+
+    if (status !== "authenticated" || !session?.user) {
+      setError("You must be logged in to create a post");
+      return;
+    }
+
+    if (!title.trim()) {
+      setError("Please enter a title for your post");
+      return;
+    }
+
+    const content = editorRef.current?.getInstance().getMarkdown();
+
+    if (!content || !content.trim()) {
+      setError("Please enter some content for your post");
       return;
     }
 
     try {
-      const editorInstance = editorRef.current.getInstance();
-      const content = editorInstance.getMarkdown();
-
-      if (!title || !content) {
-        alert("Title and content are required");
-        return;
-      }
-
-      const response = await fetch("/api/posts", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title, content }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          content,
+        }),
       });
 
       if (response.ok) {
-        router.push("/");
+        router.push("/posts");
       } else {
-        const data = await response.json();
-        alert(data.message);
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create post");
       }
     } catch (error) {
-      console.error("Failed to create post:", error);
-      alert("An error occurred. Please try again.");
+      setError(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return null;
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="mt-16">
-      <div>
-        <label htmlFor="title">Title</label>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Create New Post</h1>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
-          id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          placeholder="Post Title"
+          className="w-full p-2 mb-4 border rounded"
           required
         />
-      </div>
-      <div>
-        <label htmlFor="content">Content</label>
-        <ToastEditor ref={editorRef} />
-      </div>
-      <button type="submit">Create Post</button>
-    </form>
+        <EditorWrapper
+          forwardedRef={editorRef}
+          initialValue="Write your post content here..."
+          previewStyle="vertical"
+          height="600px"
+          initialEditType="markdown"
+          useCommandShortcut={true}
+        />
+        <button
+          type="submit"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Publish Post
+        </button>
+      </form>
+    </div>
   );
-};
-
-export default CreatePostPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // app/create-post/page.tsx
-
-// "use client";
-
-// import React, { useRef, useState } from "react";
-// import dynamic from "next/dynamic";
-// import { useRouter } from "next/navigation";
-
-// // Dynamically import ToastEditor to ensure it's only rendered on the client side
-// const ToastEditor = dynamic(() => import("../(components)/ToastEditor"), {
-//   ssr: false,
-// });
-
-// type ToastEditorRef = {
-//   getInstance: () => any;
-// };
-
-// const CreatePostPage = () => {
-//   const router = useRouter();
-//   const editorRef = useRef<ToastEditorRef>(null);
-//   const [title, setTitle] = useState("");
-
-//   const handleSubmit = async (event: React.FormEvent) => {
-//     event.preventDefault();
-
-//     console.log("Editor ref:", editorRef.current);
-
-//     if (!editorRef.current) {
-//       console.error("Editor reference is not available");
-//       return;
-//     }
-
-//     try {
-//       const editorInstance = editorRef.current.getInstance();
-//       const content = editorInstance.getMarkdown();
-
-//       console.log("Title:", title);
-//       console.log("Content:", content);
-
-//       if (!title || !content) {
-//         alert("Title and content are required");
-//         return;
-//       }
-
-//       const response = await fetch("/api/posts", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ title, content }),
-//       });
-
-//       if (response.ok) {
-//         router.push("/");
-//       } else {
-//         const data = await response.json();
-//         alert(data.message);
-//       }
-//     } catch (error) {
-//       console.error("Failed to create post:", error);
-//       alert("An error occurred. Please try again.");
-//     }
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit} className="mt-16">
-//       <div>
-//         <label htmlFor="title">Title</label>
-//         <input
-//           type="text"
-//           id="title"
-//           value={title}
-//           onChange={(e) => setTitle(e.target.value)}
-//           required
-//         />
-//       </div>
-//       <div>
-//         <label htmlFor="content">Content</label>
-//         <ToastEditor ref={editorRef} />
-//       </div>
-//       <button type="submit">Create Post</button>
-//     </form>
-//   );
-// };
-
-// export default CreatePostPage;
+}

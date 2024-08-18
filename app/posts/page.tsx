@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/auth";
@@ -24,9 +25,14 @@ interface Post {
 }
 
 async function getPosts(): Promise<Post[]> {
-  const res = await fetch(`/api/posts`, {
+  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+  const host = headers().get("host") || "localhost:3000";
+  const apiUrl = `${protocol}://${host}/api/posts`;
+
+  const res = await fetch(apiUrl, {
     cache: "no-store",
   });
+
   if (!res.ok) {
     throw new Error("Failed to fetch posts");
   }
@@ -92,7 +98,6 @@ async function PostsList() {
     </>
   );
 }
-
 
 // import Link from "next/link";
 // import { getServerSession } from "next-auth/next";

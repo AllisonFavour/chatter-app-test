@@ -1,31 +1,3 @@
-// "use client";
-
-// import React, { useState, useEffect, useRef } from "react";
-// import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
-// import dynamic from "next/dynamic";
-// import {
-//   Editor as EditorType,
-//   EditorProps as ToastUIEditorProps,
-// } from "@toast-ui/react-editor";
-// import "@toast-ui/editor/dist/toastui-editor.css";
-
-// interface ExtendedEditorProps extends ToastUIEditorProps {
-//   forwardedRef?: React.RefObject<EditorType>;
-// }
-
-// const EditorWrapper = dynamic<ExtendedEditorProps>(
-//   () =>
-//     import("@toast-ui/react-editor").then((mod) => {
-//       // import("@toast-ui/editor/dist/toastui-editor.css");
-//       return ({ forwardedRef, ...props }) => (
-//         <mod.Editor ref={forwardedRef} {...props} />
-//       );
-
-//     }),
-//   { ssr: false, loading: () => <p>Loading editor...</p> }
-// );
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -92,7 +64,7 @@ export default function CreatePost() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/posts`,
+        `/api/posts`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

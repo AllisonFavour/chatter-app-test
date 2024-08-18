@@ -22,7 +22,7 @@ export default function HomePage() {
                   grow your online presence.
                 </p>
 
-                <div className="my-10">
+                <div className="my-10 hidden">
                   <div>
                     <Link
                       href="/register"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { IComment } from "@/models/Comment";
@@ -10,17 +10,17 @@ export default function CommentSection({ postId }: { postId: string }) {
   const [newComment, setNewComment] = useState("");
   const { data: session } = useSession();
 
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     const res = await fetch(`/api/posts/${postId}/comments`);
     if (res.ok) {
       const data = await res.json();
       setComments(data);
     }
-  };
+  }, [postId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +45,7 @@ export default function CommentSection({ postId }: { postId: string }) {
         <div key={comment._id} className="mb-4 p-4 bg-gray-100 rounded">
           <p className="mb-2">{comment.content}</p>
           <small className="text-gray-600">
-            By {(comment.author as any).firstName}{" "}
-            {(comment.author as any).lastName} on{" "}
+            By {comment.author.firstName} {comment.author.lastName} on{" "}
             {new Date(comment.createdAt).toLocaleDateString()}
           </small>
         </div>
@@ -69,10 +68,10 @@ export default function CommentSection({ postId }: { postId: string }) {
         </form>
       ) : (
         <p className="mt-4 text-gray-600">
-          Please{" "}
+          Please
           <span className="text-violet-600 font-bold">
-            <Link href="/login">sign in</Link>
-          </span>{" "}
+            <Link href="/login"> sign in </Link>
+          </span>
           to leave a comment.
         </p>
       )}

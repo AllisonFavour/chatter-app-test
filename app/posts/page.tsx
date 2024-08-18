@@ -1,8 +1,29 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/auth";
+import {
+  AwaitedReactNode,
+  JSXElementConstructor,
+  Key,
+  ReactElement,
+  ReactNode,
+  ReactPortal,
+  Suspense,
+} from "react";
+import PostsSkeleton from "@/app/(components)/PostsSkeleton";
+import Footer from "../(components)/Footer";
 
-async function getPosts() {
+interface Post {
+  _id: string;
+  title: string;
+  author: {
+    firstName: string;
+    lastName: string;
+  } | null;
+  createdAt: string;
+}
+
+async function getPosts(): Promise<Post[]> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`, {
     cache: "no-store",
   });
@@ -13,7 +34,6 @@ async function getPosts() {
 }
 
 export default async function Home() {
-  const posts = await getPosts();
   const session = await getServerSession(authOptions);
 
   return (
@@ -23,71 +43,52 @@ export default async function Home() {
         {session && (
           <Link
             href="/create-post"
-            className="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="mb-4 inline-block px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
           >
             Create New Post
           </Link>
         )}
       </div>
-      <div className="grid gap-6 mt-6">
-        {posts.map((post) => (
-          <div key={post._id} className="border p-4 rounded">
-            <h2 className="text-xl font-semibold mb-2">
-              <Link href={`/posts/${post._id}`}>{post.title}</Link>
-            </h2>
-            <p className="text-gray-600 mb-2">
-              By{" "}
-              {post.author
-                ? `${post.author.firstName} ${post.author.lastName}`
-                : "Unknown Author"}
-            </p>
-            <p className="text-gray-500 text-sm">
-              {new Date(post.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-        ))}
-      </div>
+      <Suspense fallback={<PostsSkeleton />}>
+        <PostsList />
+      </Suspense>
     </div>
   );
 }
 
-// import Link from 'next/link';
-// import { getServerSession } from 'next-auth/next';
-// import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-// import connectToDatabase from '@/lib/mongoose';
-// import Post from '@/models/Post';
+async function PostsList() {
+  const posts: Post[] = await getPosts();
 
-// export default async function Home() {
-//   await connectToDatabase();
-//   const posts = await Post.find().sort({ createdAt: -1 }).populate('author', 'firstName lastName');
+  return (
+    <>
+      <div className="grid gap-6 my-6">
+        {posts.map((post: Post) => (
+          <div
+            key={post._id}
+            // className="border border-violet-200 p-4 rounded shadow-[-3px_3px_0px_#7c3aed]"
+            className="border p-4 rounded"
+          >
+            <Link href={`/posts/${post._id}`}>
+              <h2 className="text-xl font-semibold mb-2">
+                <span className="text-violet-600 hover:text-violet-800">
+                  {post.title}
+                </span>
+              </h2>
+              <p className="text-gray-600 mb-2">
+                Author:{" "}
+                {post.author
+                  ? `${post.author.firstName} ${post.author.lastName}`
+                  : "Unknown Author"}
+              </p>
+              <p className="text-gray-500 text-sm">
+                {new Date(post.createdAt).toLocaleDateString()}
+              </p>
+            </Link>
+          </div>
+        ))}
+      </div>
 
-//   const session = await getServerSession(authOptions);
-
-//   return (
-//     <div className="container mx-auto p-4 mt-16">
-//       <h1 className="text-3xl font-bold mb-6">Latest Posts</h1>
-//       <div>
-//       {session && (
-//         <Link href="/create-post" className="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-//           Create New Post
-//         </Link>
-//       )}
-//       </div>
-//       <div className="grid gap-6 mt-6">
-//         {posts.map((post) => (
-//           <div key={post._id} className="border p-4 rounded">
-//             <h2 className="text-xl font-semibold mb-2">
-//               <Link href={`/posts/${post._id}`}>{post.title}</Link>
-//             </h2>
-//             <p className="text-gray-600 mb-2">
-//               By {post.author ? `${post.author.firstName} ${post.author.lastName}` : 'Unknown Author'}
-//             </p>
-//             <p className="text-gray-500 text-sm">
-//               {new Date(post.createdAt).toLocaleDateString()}
-//             </p>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
+      <Footer />
+    </>
+  );
+}

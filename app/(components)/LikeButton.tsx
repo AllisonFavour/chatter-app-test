@@ -29,7 +29,7 @@ export default function LikeButton({
   return (
     <button
       onClick={handleLike}
-      className="flex items-center space-x-1 text-blue-500 hover:text-blue-600"
+      className="flex items-center space-x-1 text-red-500 hover:text-red-400"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

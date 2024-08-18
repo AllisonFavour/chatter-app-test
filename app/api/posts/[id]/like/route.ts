@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import connectToDatabase from '@/lib/mongoose';
-import Post from '@/models/Post';
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/auth";
+import connectToDatabase from "@/lib/mongoose";
+import Post from "@/models/Post";
 
 export async function POST(
   request: Request,
@@ -10,7 +10,7 @@ export async function POST(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   await connectToDatabase();
@@ -22,7 +22,7 @@ export async function POST(
     const post = await Post.findById(postId);
 
     if (!post) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
     const userLikedIndex = post.likes.indexOf(userId);
@@ -39,7 +39,10 @@ export async function POST(
 
     return NextResponse.json(post.likes);
   } catch (error) {
-    console.error('Error updating like:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error("Error updating like:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

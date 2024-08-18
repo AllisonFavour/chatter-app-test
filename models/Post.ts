@@ -23,8 +23,8 @@ const PostSchema: Schema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  bookmarks: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  likes: { type: [mongoose.Schema.Types.ObjectId], default: [] },
+  bookmarks: { type: [mongoose.Schema.Types.ObjectId], default: [] },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 });
 

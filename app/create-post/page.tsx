@@ -1,3 +1,31 @@
+// "use client";
+
+// import React, { useState, useEffect, useRef } from "react";
+// import { useSession } from "next-auth/react";
+// import { useRouter } from "next/navigation";
+// import dynamic from "next/dynamic";
+// import {
+//   Editor as EditorType,
+//   EditorProps as ToastUIEditorProps,
+// } from "@toast-ui/react-editor";
+// import "@toast-ui/editor/dist/toastui-editor.css";
+
+// interface ExtendedEditorProps extends ToastUIEditorProps {
+//   forwardedRef?: React.RefObject<EditorType>;
+// }
+
+// const EditorWrapper = dynamic<ExtendedEditorProps>(
+//   () =>
+//     import("@toast-ui/react-editor").then((mod) => {
+//       // import("@toast-ui/editor/dist/toastui-editor.css");
+//       return ({ forwardedRef, ...props }) => (
+//         <mod.Editor ref={forwardedRef} {...props} />
+//       );
+
+//     }),
+//   { ssr: false, loading: () => <p>Loading editor...</p> }
+// );
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -8,6 +36,7 @@ import {
   Editor as EditorType,
   EditorProps as ToastUIEditorProps,
 } from "@toast-ui/react-editor";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 interface ExtendedEditorProps extends ToastUIEditorProps {
   forwardedRef?: React.RefObject<EditorType>;
@@ -16,13 +45,18 @@ interface ExtendedEditorProps extends ToastUIEditorProps {
 const EditorWrapper = dynamic<ExtendedEditorProps>(
   () =>
     import("@toast-ui/react-editor").then((mod) => {
-      import("@toast-ui/editor/dist/toastui-editor.css");
-      return ({ forwardedRef, ...props }) => <mod.Editor ref={forwardedRef} {...props} />;
+      const EditorWithRef = ({
+        forwardedRef,
+        ...props
+      }: ExtendedEditorProps) => <mod.Editor ref={forwardedRef} {...props} />;
+      EditorWithRef.displayName = "EditorWithRef";
+      return EditorWithRef;
     }),
   { ssr: false, loading: () => <p>Loading editor...</p> }
 );
 
 export default function CreatePost() {
+  // ... (state and other logic remain the same)
   const [title, setTitle] = useState("");
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -57,14 +91,17 @@ export default function CreatePost() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          content,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/posts`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title,
+            content,
+          }),
+        }
+      );
 
       if (response.ok) {
         router.push("/posts");
@@ -95,7 +132,7 @@ export default function CreatePost() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Post Title"
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-violet-200 rounded focus:outline-none focus:ring-2 focus:ring-violet-600"
           required
         />
         <EditorWrapper
@@ -108,7 +145,7 @@ export default function CreatePost() {
         />
         <button
           type="submit"
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="mt-4 px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-opacity-50"
         >
           Publish Post
         </button>

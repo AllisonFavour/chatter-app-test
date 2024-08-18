@@ -6,10 +6,10 @@ export default function Footer() {
     <>
       <footer className="w-full mx-auto text-center border-t border-t-violet-900 p-6">
         <p className="text-black text-1xl flex justify-center items-center">
-          Built with{" "}
+          Built with
           <span className="mx-2">
             <Image src={loveIcon} alt="Purple love" width={20} />
-          </span>{" "}
+          </span>
           by Trillest. &copy; 2024
         </p>
       </footer>

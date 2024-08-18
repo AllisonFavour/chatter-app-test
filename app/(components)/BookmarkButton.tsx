@@ -31,7 +31,7 @@ export default function BookmarkButton({
   return (
     <button
       onClick={handleBookmark}
-      className="flex items-center space-x-1 text-yellow-500 hover:text-yellow-600"
+      className="flex items-center space-x-1 text-gray-500 hover:text-gray-600"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
